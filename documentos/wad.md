@@ -16,7 +16,7 @@
 
 ## <a name="c1"></a>1. Introdução
 
-&emsp;*Laços de Leitura* é uma aplicação web que permite a criação de uma biblioteca virtual pessoal para registro de leituras realizadas de obras de Clarice Lispector. A partir do momento em que o usuário adiciona o livro em sua biblioteca, pode registrar a nota que daria para o livro e sua leitura, além do tempo que levou e, também, se possui o livro físico ou não.
+&emsp;*Laços de Leitura- é uma aplicação web que permite a criação de uma biblioteca virtual pessoal para registro de leituras realizadas de obras de Clarice Lispector. A partir do momento em que o usuário adiciona o livro em sua biblioteca, pode registrar a nota que daria para o livro e sua leitura, além do tempo que levou e, também, se possui o livro físico ou não.
 &emsp;O sistema se baseia na integração de um banco de dados em uma aplicação web, com back-end feito em JavaScript e front-end em CSS e HTML.
 
 ---
@@ -31,25 +31,89 @@
 
 ## <a name="c3"></a>3. Projeto da Aplicação Web
 
-### 3.1. Modelagem do banco de dados  (Semana 3)
+### 3.1. Modelagem do banco de dados
 
-*Posicione aqui os diagramas de modelos relacionais do seu banco de dados, apresentando todos os esquemas de tabelas e suas relações. Utilize texto para complementar suas explicações, se necessário.*
-
-*Posicione também o modelo físico com o Schema do BD (arquivo .sql)*
+<img src='../modelo-banco.png'>
 
 ### 3.1.1 BD e Models (Semana 5)
-*Descreva aqui os Models implementados no sistema web*
 
-### 3.2. Arquitetura (Semana 5)
+#### 3.1.1.1. Model User
 
-*Posicione aqui o diagrama de arquitetura da sua solução de aplicação web. Atualize sempre que necessário.*
+Responsabilidade: Gerenciar dados da tabela users
 
-**Instruções para criação do diagrama de arquitetura**  
-- **Model**: A camada que lida com a lógica de negócios e interage com o banco de dados.
-- **View**: A camada responsável pela interface de usuário.
-- **Controller**: A camada que recebe as requisições, processa as ações e atualiza o modelo e a visualização.
-  
-*Adicione as setas e explicações sobre como os dados fluem entre o Model, Controller e View.*
+Métodos:
+- GETAll(): Retorna todos os usuários ordenados por username
+- GETById(id): Busca um usuário específico pelo ID
+- create(data): Cria novo usuário
+- update(id, data): Atualiza username de um usuário
+- delete(id): Remove usuário
+
+Métodos auxiliares:
+- GETByUsername(username): Busca usuário pelo nome
+- exists(id): Verifica se usuário existe
+
+
+#### 3.1.1.2. Model Book
+Responsabilidade: Gerenciar dados da tabela book e suas relações com gêneros
+
+Métodos:
+- GETAll(): Lista todos os livros com nome do gênero
+- GETById(id): Busca livro específico com dados do gênero
+- create(data): Adiciona novo livro
+- update(id, data): Atualiza dados do livro
+- delete(id): Remove livro
+- searchByTitle(title): Busca livros por título
+- GETByGenre(genreId): Retorna todos os livros de um gênero específico
+
+Métodos auxiliares:
+- exists(id): Verifica se livro existe
+
+
+#### 3.1.1.3. Model Reading
+Responsabilidade: Gerenciar dados da tabela users_book (relacionamento entre usuários e livros)
+
+Métodos:
+- GETAll(): Todas as leituras com dados de usuário, livro e gênero
+- create(data): Cria nova leitura
+- update(userId, bookId, data): Atualiza leitura específica
+- delete(userId, bookId): Remove leitura específica
+- GETByUser(userId): Todas as leituras de um usuário com dados dos livros
+- GETByBook(bookId): Todos os usuários que leram um livro específico
+- GETByUserAndBook(userId, bookId): Leitura específica de um usuário para um livro
+
+Métodos auxiliares:
+- exists(userId, bookId): Verifica se já existe leitura para este par usuário-livro
+- deleteByBookId(bookId): Remove todas as leituras de um livro
+
+### 3.2. Arquitetura
+
+<img src= '../diagrama-arquitetura-mvc.jpg'>
+
+Esse diagrama representa a arquitetura MVC (Model-View-Controller) de uma aplicação web com backend em Node.js + Express e banco de dados PostgreSQL.
+
+### Funcionamento entre as camadas:
+
+#### Frontend
+
+- O navegador (Browser) acessa a aplicação via `localhost:3000` usando JavaScript para interagir com a API backend.
+
+#### Backend (Node.js + Express)
+
+- A requisição é enviada para a API.
+- Os endpoints são definidos nas rotas.
+- As rotas chamam os controllers (`UsersController`, `BooksController`, `ReadingController`), que contêm a lógica de negócio.
+- Os controllers interagem com os models (`userModel`, `bookModel`, `readingModel`), responsáveis pela comunicação com o banco de dados.
+- Os models usam um conector de banco (`config/database.js`) para executar queries no PostgreSQL.
+
+### Camadas:
+
+- Rotas: definem os caminhos da API.
+- Controllers: tratam a lógica de negócio.
+- Models: fazem a interface com o banco.
+- Database: armazena os dados de usuários, livros e leituras.
+
+Essa estrutura separa responsabilidades, facilita manutenção e escalabilidade.
+
 
 ### 3.3. Wireframes (Semana 03 - opcional)
 
@@ -64,9 +128,23 @@
 
 *Posicione aqui algumas imagens demonstrativas de seu protótipo de alta fidelidade e o link para acesso ao protótipo completo (mantenha o link sempre público para visualização).*
 
-### 3.6. WebAPI e endpoints (Semana 05)
+### 3.6. WebAPI e endpoints 
 
-*Utilize um link para outra página de documentação contendo a descrição completa de cada endpoint. Ou descreva aqui cada endpoint criado para seu sistema.*  
+#### 3.6.1. Rotas de Usuários
+
+- POST /api/users - Cria um novo usuário no sistema
+- GET /api/users/:id - Busca e retorna o perfil de um usuário específico pelo ID
+
+#### 3.6.2. Rotas de Livros
+
+- GET /api/livros - Lista todos os livros disponíveis no sistema
+- GET /api/livros/buscar - Permite buscar livros específicos (provavelmente por título, autor, etc.)
+
+#### 3.6.3. Rotas de Leituras
+
+- POST /api/leituras - Registra uma nova leitura (quando um usuário começa/termina um livro)
+- GET /api/leituras/user/:userId - Busca todas as leituras de um usuário específico
+- DELETE /api/leituras/:readingId - Remove um registro de leitura específico
 
 ### 3.7 Interface e Navegação (Semana 07)
 

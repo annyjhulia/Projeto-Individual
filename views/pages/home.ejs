@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laços de Leitura - Biblioteca Virtual Clarice Lispector</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Crimson+Text:ital,wght@0,400;0,600;1,400&family=Playfair+Display:wght@400;700&display=swap"
+        rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Crimson Text', serif;
+            background: linear-gradient(135deg, #f4f1e8 0%, #e8dcc6 100%);
+            min-height: 100vh;
+            color: #2c1810;
+            line-height: 1.6;
+        }
+
+        .vintage-paper {
+            background: linear-gradient(45deg, #faf8f3 0%, #f5f1e8 50%, #f0ebe0 100%);
+            position: relative;
+            box-shadow:
+                inset 0 0 20px rgba(139, 69, 19, 0.1),
+                0 0 20px rgba(139, 69, 19, 0.15);
+        }
+
+        .vintage-paper::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 20% 50%, rgba(139, 69, 19, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 80% 20%, rgba(139, 69, 19, 0.05) 0%, transparent 20%),
+                radial-gradient(circle at 40% 80%, rgba(139, 69, 19, 0.05) 0%, transparent 20%);
+            pointer-events: none;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            border-bottom: 3px double #8b4513;
+            margin-bottom: 40px;
+        }
+
+        .header-ornament {
+            font-size: 2em;
+            color: #8b4513;
+            margin: 10px 0;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5em;
+            color: #2c1810;
+            text-shadow: 2px 2px 4px rgba(139, 69, 19, 0.3);
+            margin: 20px 0;
+            letter-spacing: 2px;
+        }
+
+        .subtitle {
+            font-style: italic;
+            font-size: 1.4em;
+            color: #5d4037;
+            margin-bottom: 20px;
+        }
+
+        .author-quote {
+            font-style: italic;
+            font-size: 1.1em;
+            color: #6d4c41;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            border-left: 4px solid #8b4513;
+            background: rgba(139, 69, 19, 0.05);
+            border-radius: 0 15px 15px 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .book-form {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 30px;
+            border-radius: 15px;
+            border: 2px solid #d7ccc8;
+            box-shadow: 0 8px 20px rgba(139, 69, 19, 0.2);
+        }
+
+        .form-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2em;
+            color: #2c1810;
+            margin-bottom: 20px;
+            text-align: center;
+            border-bottom: 2px solid #8b4513;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            color: #2c1810;
+            margin-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #d7ccc8;
+            border-radius: 8px;
+            font-family: 'Crimson Text', serif;
+            font-size: 1em;
+            background: rgba(255, 255, 255, 0.9);
+            transition: all 0.3s ease;
+            box-shadow: inset 0 2px 4px rgba(139, 69, 19, 0.1);
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #8b4513;
+            box-shadow: 0 0 0 3px rgba(139, 69, 19, 0.2);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            transform: scale(1.2);
+        }
+
+        .vintage-button {
+            background: linear-gradient(135deg, #8b4513 0%, #a0522d 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(139, 69, 19, 0.3);
+            letter-spacing: 1px;
+        }
+
+        .vintage-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(139, 69, 19, 0.4);
+            background: linear-gradient(135deg, #a0522d 0%, #8b4513 100%);
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .stats-card,
+        .clarice-info {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid #d7ccc8;
+            box-shadow: 0 8px 20px rgba(139, 69, 19, 0.2);
+        }
+
+        .stats-title,
+        .info-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5em;
+            color: #2c1810;
+            margin-bottom: 15px;
+            text-align: center;
+            border-bottom: 2px solid #8b4513;
+            padding-bottom: 8px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 8px 0;
+            border-bottom: 1px dotted #d7ccc8;
+        }
+
+        .stat-value {
+            font-weight: 600;
+            color: #8b4513;
+        }
+
+        .books-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+        }
+
+        .book-card {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid #d7ccc8;
+            box-shadow: 0 8px 20px rgba(139, 69, 19, 0.2);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .book-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: linear-gradient(135deg, #8b4513, #a0522d);
+        }
+
+        .book-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(139, 69, 19, 0.3);
+        }
+
+        .book-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4em;
+            color: #2c1810;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .book-info {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            font-size: 1em;
+        }
+
+        .book-info span {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .rating {
+            color: #ff6b35;
+            font-size: 1.2em;
+        }
+
+        .physical-book {
+            background: linear-gradient(135deg, #4caf50, #45a049);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .digital-book {
+            background: linear-gradient(135deg, #2196f3, #1976d2);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .delete-btn {
+            background: linear-gradient(135deg, #d32f2f, #c62828);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.3s ease;
+        }
+
+        .delete-btn:hover {
+            background: linear-gradient(135deg, #c62828, #b71c1c);
+            transform: scale(1.05);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            border-top: 3px double #8b4513;
+            margin-top: 60px;
+            background: rgba(139, 69, 19, 0.05);
+        }
+
+        .footer-quote {
+            font-style: italic;
+            font-size: 1.1em;
+            color: #5d4037;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            h1 {
+                font-size: 2.5em;
+            }
+
+            .books-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            font-style: italic;
+            color: #8b4513;
+        }
+
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #c62828;
+            margin: 10px 0;
+        }
+
+        .success {
+            background: #e8f5e8;
+            color: #2e7d32;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #2e7d32;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+
+<body class="vintage-paper">
+    <header>
+        <h1>Laços de Leitura</h1>
+        <p class="subtitle">Biblioteca Virtual de Clarice Lispector</p>
+        <div class="author-quote">
+            “Sou uma mulher que escreve porque, para mim, escrever é como respirar, faço para sobreviver” <br><strong>—
+                Clarice Lispector</strong>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="main-content">
+            <section class="book-form">
+                <h2 class="form-title">Adicionar Nova Leitura</h2>
+                <form id="bookForm">
+                    <div class="form-group">
+                        <label for="bookTitle">Título da Obra</label>
+                        <select id="bookTitle" name="titulo" required>
+                            <option value="">Selecione uma obra...</option>
+                    
+                            <% livros.forEach(livro => { %>
+                                <option value="<%= livro.id %>"><%= livro.title %></option>
+                            <% }) %>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="rating">Nota (1-5)</label>
+                        <select id="rating" name="nota" required>
+                            <option value="">Selecione uma nota...</option>
+                            <option value="1">0.5</option>
+                            <option value="2">1.0</option>
+                            <option value="3">1.5</option>
+                            <option value="4">2.0</option>
+                            <option value="5">2.5</option>
+                            <option value="6">3.0</option>
+                            <option value="7">3.5</option>
+                            <option value="8">4.0</option>
+                            <option value="9">4.5</option>
+                            <option value="10">5.0</option>
+                            <option value="11">5.5</option>
+                            <option value="12">6.0</option>
+                            <option value="13">6.5</option>
+                            <option value="14">7.0</option>
+                            <option value="15">7.5</option>
+                            <option value="16">8.0</option>
+                            <option value="17">8.5</option>
+                            <option value="18">9.0</option>
+                            <option value="19">9.5</option>
+                            <option value="20">10.0</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="readingTime">Tempo de Leitura (em horas)</label>
+                        <input type="number" id="readingTime" name="tempoLeitura" min="1" max="1000" required>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="physicalBook" name="livroFisico">
+                            <label for="physicalBook">Possuo o livro físico</label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="notes">Notas Pessoais (opcional)</label>
+                        <textarea id="notes" name="observacoes" rows="4"
+                            placeholder="Suas impressões sobre a obra..."></textarea>
+                    </div>
+
+                    <button type="submit" class="vintage-button">Adicionar à Biblioteca</button>
+                </form>
+
+                <div id="message"></div>
+            </section>
+
+            <aside class="sidebar">
+                <div class="stats-card">
+                    <h3 class="stats-title">Estatísticas</h3>
+                    <div class="stat-item">
+                        <span>Livros Lidos:</span>
+                        <span class="stat-value" id="totalBooks">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>Nota Média:</span>
+                        <span class="stat-value" id="averageRating">0.0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>Livros Físicos:</span>
+                        <span class="stat-value" id="physicalCount">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>Livros Digitais:</span>
+                        <span class="stat-value" id="digitalCount">0</span>
+                    </div>
+                </div>
+
+                <div class="clarice-info">
+                    <h3 class="info-title">Sobre Clarice</h3>
+                    <p style="font-style: italic; text-align: justify; color: #5d4037;">
+                        Clarice Lispector (1920-1977) foi uma das mais importantes escritoras brasileiras do século XX.
+                        Nascida na Ucrânia e criada no Brasil, revolucionou a literatura nacional com sua prosa
+                        introspectiva
+                        e filosófica, explorando a condição humana, principalmente feminina e de uma visão imigrante, com profundidade única.
+                    </p>
+                </div>
+            </aside>
+        </div>
+
+        <section class="books-grid" id="booksGrid">
+            <div class="loading">Carregando biblioteca...</div>
+        </section>
+    </div>
+
+    <footer class="footer">
+        <p class="footer-quote">"Escrevo para entender. Escrevo para viver."</p>
+        <p>© 2025 Laços de Leitura - Uma homenagem à obra de Clarice Lispector</p>
+    </footer>
+
+    <script>
+        // Simulação de dados para demonstração (substituir pela integração real com o backend)
+        let books = JSON.parse(localStorage.getItem('clariceBooks') || '[]');
+
+        // API Base URL (ajustar conforme configuração do backend)
+        const API_BASE_URL = 'http://localhost:3000/api';
+
+        // Função para mostrar mensagens
+        function showMessage(text, type = 'success') {
+            const messageDiv = document.getElementById('message');
+            messageDiv.innerHTML = `<div class="${type}">${text}</div>`;
+            setTimeout(() => messageDiv.innerHTML = '', 5000);
+        }
+
+        // Função para atualizar estatísticas
+        function updateStats() {
+            const totalBooks = books.length;
+            const averageRating = totalBooks > 0 ?
+                (books.reduce((sum, book) => sum + book.nota, 0) / totalBooks).toFixed(1) : '0.0';
+            const physicalCount = books.filter(book => book.livroFisico).length;
+            const digitalCount = totalBooks - physicalCount;
+
+            document.getElementById('totalBooks').textContent = totalBooks;
+            document.getElementById('averageRating').textContent = averageRating;
+            document.getElementById('physicalCount').textContent = physicalCount;
+            document.getElementById('digitalCount').textContent = digitalCount;
+        }
+
+        // Função para renderizar a grade de livros
+        function renderBooks() {
+            const grid = document.getElementById('booksGrid');
+
+            if (books.length === 0) {
+                grid.innerHTML = '<div class="loading">Sua biblioteca está vazia. Adicione sua primeira leitura!</div>';
+                return;
+            }
+
+            grid.innerHTML = books.map((book, index) => `
+                <div class="book-card">
+                    <h3 class="book-title">${book.titulo}</h3>
+                    <div class="book-info">
+                        <span>
+                            <strong>Nota:</strong> 
+                            <span class="rating">${'⭐'.repeat(book.nota)}</span>
+                        </span>
+                        <span>
+                            <strong>Tempo de Leitura:</strong> 
+                            ${book.tempoLeitura} ${book.tempoLeitura === 1 ? 'dia' : 'dias'}
+                        </span>
+                        <span>
+                            <strong>Formato:</strong> 
+                            <span class="${book.livroFisico ? 'physical-book' : 'digital-book'}">
+                                ${book.livroFisico ? 'Físico' : 'Digital'}
+                            </span>
+                        </span>
+                        ${book.observacoes ? `
+                            <span style="margin-top: 10px;">
+                                <strong>Notas:</strong><br>
+                                <em style="color: #5d4037;">${book.observacoes}</em>
+                            </span>
+                        ` : ''}
+                        <span style="margin-top: 15px;">
+                            <button class="delete-btn" onclick="deleteBook(${index})">Remover</button>
+                        </span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Função para deletar livro
+        function deleteBook(index) {
+            if (confirm('Tem certeza que deseja remover este livro da sua biblioteca?')) {
+                books.splice(index, 1);
+                localStorage.setItem('clariceBooks', JSON.stringify(books));
+                renderBooks();
+                updateStats();
+                showMessage('Livro removido da biblioteca com sucesso!');
+            }
+        }
+
+        // Função para adicionar livro
+        async function addBook(bookData) {
+            try {
+                // Tentativa de integração com backend real
+                const response = await fetch(`${API_BASE_URL}/books`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(bookData)
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    showMessage('Livro adicionado à biblioteca com sucesso!');
+                    loadBooks(); // Recarregar livros do servidor
+                } else {
+                    throw new Error('Erro no servidor');
+                }
+            } catch (error) {
+                // Fallback para armazenamento local se o backend não estiver disponível
+                console.warn('Backend não disponível, usando armazenamento local:', error);
+
+                books.push({
+                    ...bookData,
+                    id: Date.now(),
+                    dataAdicao: new Date().toISOString()
+                });
+
+                localStorage.setItem('clariceBooks', JSON.stringify(books));
+                renderBooks();
+                updateStats();
+                showMessage('Livro adicionado à biblioteca com sucesso!');
+            }
+        }
+
+        // Função para carregar livros do backend
+        async function loadBooks() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/books`);
+                if (response.ok) {
+                    books = await response.json();
+                } else {
+                    throw new Error('Erro ao carregar livros');
+                }
+            } catch (error) {
+                console.warn('Erro ao carregar do backend, usando dados locais:', error);
+                // Manter dados locais se o backend não estiver disponível
+            }
+
+            renderBooks();
+            updateStats();
+        }
+
+        // Event listener para o formulário
+        document.getElementById('bookForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const bookData = {
+                titulo: formData.get('titulo'),
+                nota: parseInt(formData.get('nota')),
+                tempoLeitura: parseInt(formData.get('tempoLeitura')),
+                livroFisico: formData.get('livroFisico') === 'on',
+                observacoes: formData.get('observacoes') || ''
+            };
+
+            // Verificar se o livro já foi adicionado
+            const existingBook = books.find(book => book.titulo === bookData.titulo);
+            if (existingBook) {
+                showMessage('Este livro já está em sua biblioteca!', 'error');
+                return;
+            }
+
+            addBook(bookData);
+            this.reset();
+        });
+
+        // Inicializar a aplicação
+        document.addEventListener('DOMContentLoaded', function () {
+            loadBooks();
+        });
+    </script>
+</body>
+
+</html>

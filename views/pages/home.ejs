@@ -564,7 +564,7 @@
 
         async function addBook(bookData) {
             try {
-                const response = await fetch(`${API_BASE_URL}/books`, {
+                const response = await fetch(`${API_BASE_URL}/api/livros`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -597,7 +597,7 @@
 
         async function loadBooksFromDatabase() {
             try {
-                const response = await fetch(`${API_BASE_URL}/books`);
+                const response = await fetch(`${API_BASE_URL}/api/livros`);
                 if (response.ok) {
                     books = await response.json();
                 } else {
@@ -633,7 +633,7 @@
 
         async function loadBooks() {
             try {
-                const response = await fetch(`${API_BASE_URL}/books`);
+                const response = await fetch(`${API_BASE_URL}/api/livros`);
                 if (!response.ok) {
                     throw new Error(`Erro ao buscar books: ${response.status}`);
                 }

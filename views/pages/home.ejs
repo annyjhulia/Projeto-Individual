@@ -407,16 +407,6 @@
                             <option value="8">4.0</option>
                             <option value="9">4.5</option>
                             <option value="10">5.0</option>
-                            <option value="11">5.5</option>
-                            <option value="12">6.0</option>
-                            <option value="13">6.5</option>
-                            <option value="14">7.0</option>
-                            <option value="15">7.5</option>
-                            <option value="16">8.0</option>
-                            <option value="17">8.5</option>
-                            <option value="18">9.0</option>
-                            <option value="19">9.5</option>
-                            <option value="20">10.0</option>
                         </select>
                     </div>
 
@@ -454,6 +444,10 @@
                     <div class="stat-item">
                         <span>Nota Média:</span>
                         <span class="stat-value" id="averageRating">0.0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span>Tempo Médio (horas):</span>
+                        <span class="stat-value" id="averageTime">0.0</span>
                     </div>
                     <div class="stat-item">
                         <span>Livros Físicos:</span>
@@ -502,14 +496,20 @@
         function updateStats() {
             const totalBooks = books.length;
             const averageRating = totalBooks > 0 ?
-                (books.reduce((sum, book) => sum + book.nota, 0) / totalBooks).toFixed(1) : '0.0';
-            const physicalCount = books.filter(book => book.bookFisico).length;
+                (books.reduce((sum, book) => sum + parseFloat(book.rating || book.nota || 0), 0) / totalBooks).toFixed(1) : '0.0';
+            const averageTime = totalBooks > 0 ?
+                (books.reduce((sum, book) => sum + parseInt(book.reading_time || book.tempoLeitura || 0), 0) / totalBooks).toFixed(1) : '0.0';
+            const physicalCount = books.filter(book => book.owned || book.bookFisico).length;
             const digitalCount = totalBooks - physicalCount;
 
             document.getElementById('totalBooks').textContent = totalBooks;
             document.getElementById('averageRating').textContent = averageRating;
             document.getElementById('physicalCount').textContent = physicalCount;
             document.getElementById('digitalCount').textContent = digitalCount;
+            
+            if (document.getElementById('averageTime')) {
+                document.getElementById('averageTime').textContent = averageTime;
+            }
         }
 
         function renderBooks() {
@@ -522,20 +522,21 @@
 
             grid.innerHTML = books.map((book, index) => `
                 <div class="book-card">
-                    <h3 class="book-title">${book.titulo}</h3>
+                    <h3 class="book-title">${book.title}</h3>
                     <div class="book-info">
                         <span>
                             <strong>Nota:</strong> 
-                            <span class="rating">${'⭐'.repeat(book.nota)}</span>
+                            <span class="rating">${'⭐'.repeat(Math.round(parseFloat(book.rating || book.nota || 0) / 2))}</span>
+                            (${parseFloat(book.rating || book.nota || 0).toFixed(1)})
                         </span>
                         <span>
                             <strong>Tempo de Leitura:</strong> 
-                            ${book.tempoLeitura} ${book.tempoLeitura === 1 ? 'dia' : 'dias'}
+                            ${book.reading_time || book.tempoLeitura || 0} ${(book.reading_time || book.tempoLeitura) === 1 ? 'hora' : 'horas'}
                         </span>
                         <span>
                             <strong>Formato:</strong> 
-                            <span class="${book.bookFisico ? 'physical-book' : 'digital-book'}">
-                                ${book.bookFisico ? 'Físico' : 'Digital'}
+                            <span class="${(book.owned || book.bookFisico) ? 'physical-book' : 'digital-book'}">
+                                ${(book.owned || book.bookFisico) ? 'Físico' : 'Digital'}
                             </span>
                         </span>
                         ${book.observacoes ? `
@@ -557,9 +558,8 @@
                 const bookToDelete = books[index];
 
                 try {
-                    // Se tiver ID do banco, tenta remover via API
-                    if (bookToDelete.book_id) {
-                        fetch(`${API_BASE_URL}/api${bookToDelete.book_id}`, {
+                    if (bookToDelete.id) {
+                        fetch(`${API_BASE_URL}/api/leituras/${bookToDelete.id}`, {
                             method: 'DELETE'
                         }).then(response => {
                             if (response.ok) {
@@ -575,7 +575,6 @@
                             showMessage('Erro ao remover livro do banco de dados', 'error');
                         });
                     } else {
-                        // Remoção local
                         books.splice(index, 1);
                         localStorage.setItem('books', JSON.stringify(books));
                         renderBooks();
@@ -591,16 +590,15 @@
 
         async function addBook(bookData) {
             try {
-                // Converter para o formato esperado pela API
                 const readingData = {
-                    user_id: 1, // Assumindo usuário fixo ou obter de algum lugar
-                    book_id: parseInt(bookData.titulo), // O valor do select é o ID do livro
+                    user_id: 1, 
+                    book_id: parseInt(bookData.id), 
                     rating: bookData.nota,
                     reading_time: bookData.tempoLeitura,
                     owned: bookData.bookFisico
                 };
 
-                const response = await fetch(`${API_BASE_URL}/api`, {
+                const response = await fetch(`${API_BASE_URL}/api/leituras`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -610,7 +608,6 @@
 
                 if (response.ok) {
                     showMessage('Livro adicionado à biblioteca com sucesso!');
-                    // Recarregar a biblioteca do usuário
                     loadBooksFromDatabase();
                 } else {
                     const errorData = await response.json();
@@ -620,10 +617,15 @@
                 console.warn('Erro ao adicionar livro:', error);
                 showMessage(`Erro: ${error.message}`, 'error');
 
-                // Fallback para armazenamento local se o backend falhar
+                const selectElement = document.getElementById('bookTitle');
+                const selectedOption = selectElement.options[selectElement.selectedIndex];
+                const bookTitle = selectedOption && selectedOption.value !== "" ? 
+                    selectedOption.textContent : bookData.title;
+                
                 books.push({
                     ...bookData,
                     id: Date.now(),
+                    title: bookTitle, 
                     dataAdicao: new Date().toISOString()
                 });
 
@@ -636,13 +638,19 @@
 
         async function loadBooksFromDatabase() {
             try {
-                // Assumindo usuário fixo com ID 1 ou obter de algum lugar
                 const userId = 1;
-                const response = await fetch(`${API_BASE_URL}/api/user/${userId}`);
+                const response = await fetch(`${API_BASE_URL}/api/leituras/user/${userId}`);
 
                 if (response.ok) {
                     const data = await response.json();
                     books = data.users_book || [];
+                    books = books.map(book => ({
+                        ...book,
+                        rating: parseFloat(book.rating || 0),
+                        reading_time: parseInt(book.reading_time || 0),
+                        nota: parseFloat(book.nota || 0),
+                        tempoLeitura: parseInt(book.tempoLeitura || 0)
+                    }));
                     renderBooks();
                     updateStats();
                 } else {
@@ -650,8 +658,12 @@
                 }
             } catch (error) {
                 console.error('Falha na conexão com o banco de dados:', error);
-                // Fallback para localStorage
                 books = JSON.parse(localStorage.getItem('books') || '[]');
+                books = books.map(book => ({
+                    ...book,
+                    nota: parseFloat(book.nota || 0),
+                    tempoLeitura: parseInt(book.tempoLeitura || 0)
+                }));
                 renderBooks();
                 updateStats();
             }
@@ -661,17 +673,26 @@
             e.preventDefault();
 
             const formData = new FormData(this);
+            const selectElement = document.getElementById('bookTitle');
+            const selectedOption = selectElement.options[selectElement.selectedIndex];
+            
+            if (!selectedOption || selectedOption.value === "") {
+                showMessage('Por favor, selecione uma obra válida', 'error');
+                return;
+            }
+            
             const bookData = {
-                titulo: formData.get('titulo'),
+                id: selectedOption.value,
+                title: selectedOption.textContent, 
                 nota: parseInt(formData.get('nota')),
                 tempoLeitura: parseInt(formData.get('tempoLeitura')),
                 bookFisico: formData.get('bookFisico') === 'on',
                 observacoes: formData.get('observacoes') || ''
             };
 
-            const existingBook = books.find(book => book.titulo === bookData.titulo);
+            const existingBook = books.find(book => book.book_id === parseInt(bookData.id));
             if (existingBook) {
-                showMessage('Este book já está em sua biblioteca!', 'error');
+                showMessage('Este livro já está em sua biblioteca!', 'error');
                 return;
             }
 
@@ -683,30 +704,34 @@
             try {
                 const response = await fetch(`${API_BASE_URL}/api/livros`);
                 if (!response.ok) {
-                    throw new Error(`Erro ao buscar books: ${response.status}`);
+                    throw new Error(`Erro ao buscar livros: ${response.status}`);
                 }
 
                 const bookData = await response.json();
                 console.log("Dados recebidos:", bookData);
 
                 const selectElement = document.getElementById('bookTitle');
-
+                
                 while (selectElement.options.length > 1) {
                     selectElement.remove(1);
                 }
 
                 const books = Array.isArray(bookData) ? bookData : [];
-
+                
                 books.forEach(book => {
-                    const option = document.createElement('option');
-                    option.value = book.id;
-                    option.textContent = book.title || book.titulo;
-                    selectElement.appendChild(option);
-                    console.log(`Adicionada opção: ${option.textContent} (ID: ${option.value})`);
+                    if (book && book.title) {
+                        const option = document.createElement('option');
+                        option.value = book.id;
+                        option.textContent = book.title;
+                        selectElement.appendChild(option);
+                        console.log(`Adicionada opção: ${option.textContent} (ID: ${option.value})`);
+                    } else {
+                        console.warn("Livro sem título encontrado:", book);
+                    }
                 });
 
                 if (books.length === 0) {
-                    console.warn("Nenhum book encontrado na resposta da API");
+                    console.warn("Nenhum livro encontrado na resposta da API");
                 }
             } catch (error) {
                 console.error('Falha ao carregar livros:', error);
